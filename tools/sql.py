@@ -4,9 +4,13 @@ from langchain.tools import Tool
 conn = sqlite3.connect('db.sqlite')
 
 def run_sqlite_query(query):
+
     c = conn.cursor()
-    c.execute(query)
-    return c.fetchall()
+    try:
+        c.execute(query)
+        return c.fetchall()
+    except sqlite3.OperationalError as err:
+        return f"The following error occurred : {str(err)}"
 
 
 run_query_tool = Tool.from_function(
