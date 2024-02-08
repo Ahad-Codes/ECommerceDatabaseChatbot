@@ -22,10 +22,18 @@ def run_sqlite_query(query):
         return f"The following error occurred : {str(err)}"
 
 
+
+class RunQueryArgsSchema(BaseModel):
+    query: str
+
+class DescribleTableArgsSchema(BaseModel):
+    tables_name: List[str]
+
 run_query_tool = Tool.from_function(
     name="run_sqlite_query",
     description="Run a query on the sqlite database",
-    func=run_sqlite_query
+    func=run_sqlite_query,
+    args_schema=RunQueryArgsSchema
 
 )
 
@@ -40,5 +48,7 @@ def describe_tables(tables_name):
 describe_tables_tool = Tool.from_function(
     name = "describe_tables",
     description= "Given a list of table names, return the schema of the tables",
-    func= describe_tables
+    func= describe_tables,
+    args_schema=DescribleTableArgsSchema
 )
+
