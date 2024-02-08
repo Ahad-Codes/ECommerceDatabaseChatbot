@@ -1,5 +1,7 @@
 import sqlite3
 from langchain.tools import Tool
+from pydantic import BaseModel
+from typing import List
 
 conn = sqlite3.connect('db.sqlite')
 
@@ -25,4 +27,18 @@ run_query_tool = Tool.from_function(
     description="Run a query on the sqlite database",
     func=run_sqlite_query
 
+)
+
+def describe_tables(tables_name):
+    c = conn.cursor()
+    tables = ', '.join("'" + table + "'" for table in tables_name.split(','))
+    rows = c.execute(f'SELECT sql from sqlite_master where type="table" and name in ({tables})')
+    return '\n'.join(row[0] for row in rows if row[0] is not None)
+
+
+
+describe_tables_tool = Tool.from_function(
+    name = "describe_tables",
+    description= "Given a list of table names, return the schema of the tables",
+    func= describe_tables
 )
